@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>The Vikings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Conceptual TrackingTo start out let’s lay out the bits of information that we have to start with. We know the following:
+
+The dimensions of the target
+The field of vision of the camera
+The target is r">
+<meta property="og:type" content="article">
+<meta property="og:title" content="The Vikings">
+<meta property="og:url" content="https://FRCTeam2984.github.io/courses/VisionTracking/BasicConcept/index.html">
+<meta property="og:site_name" content="The Vikings">
+<meta property="og:description" content="Conceptual TrackingTo start out let’s lay out the bits of information that we have to start with. We know the following:
+
+The dimensions of the target
+The field of vision of the camera
+The target is r">
+<meta property="og:image" content="https://FRCTeam2984.github.io/images/courses/VisionTracking/target.png">
+<meta property="og:image" content="https://FRCTeam2984.github.io/images/courses/VisionTracking/targetHSV.png">
+<meta property="og:image" content="https://FRCTeam2984.github.io/images/courses/VisionTracking/targetBinary.png">
+<meta property="og:image" content="https://FRCTeam2984.github.io/images/courses/VisionTracking/targetMinAreaRectLabled.png">
+<meta property="og:image" content="https://FRCTeam2984.github.io/images/courses/VisionTracking/cameraDistance.svg">
+<meta property="og:image" content="https://FRCTeam2984.github.io/images/courses/VisionTracking/cameraRotation.svg">
+<meta property="og:updated_time" content="2017-03-14T22:56:47.748Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Vikings">
+<meta name="twitter:description" content="Conceptual TrackingTo start out let’s lay out the bits of information that we have to start with. We know the following:
+
+The dimensions of the target
+The field of vision of the camera
+The target is r">
+<meta name="twitter:image" content="https://FRCTeam2984.github.io/images/courses/VisionTracking/target.png">
+  
+  
+    <link rel="icon" href="/first/images/Logo.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-79743620-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <div id="header-inner">
+  <nav id="main-nav">
+    <a href="/"><img class="headerImage" src=/images/Logo.png></a>
+    <div class="imageShift">
+      <a id="main-nav-toggle" class="nav-icon"></a>
+      
+        <a class="main-nav-link" href="/">Home</a>
+      
+        <a class="main-nav-link" href="/donate">Donate</a>
+      
+        <a class="main-nav-link" href="/about">About</a>
+      
+        <a class="main-nav-link" href="/calendar">Calendar</a>
+      
+        <a class="main-nav-link" href="/courses">Courses</a>
+      
+    </div>
+  </nav>
+  <nav id="sub-nav">
+    
+    <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+  </nav>
+  <div id="search-form-wrap">
+    <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://FRCTeam2984.github.io"></form>
+  </div>
+</div>
+
+      
+        <div class="outer">
+          
+            <div class="navigation-bar article-entry">
+  
+    <a href=/courses/VisionTracking/GameApplication/ class="next">
+      <div class="next-div">Next</div>
+    </a>
+  
+  
+    <a href=/courses/VisionTracking/ class="home">
+      <div class="home-div">Course Home</div>
+    </a>
+  
+</div>
+
+          
+          <section id="main"><div class="index article article-entry">
+  <h1 id="Conceptual-Tracking"><a href="#Conceptual-Tracking" class="headerlink" title="Conceptual Tracking"></a>Conceptual Tracking</h1><p>To start out let’s lay out the bits of information that we have to start with. We know the following:</p>
+<ul>
+<li>The dimensions of the target</li>
+<li>The field of vision of the camera</li>
+<li>The target is retro reflective</li>
+</ul>
+<p>The first thing we will want to do is acquire a useful image. In this case we will illuminate the retro reflective tape to create two very bright targets. This is the image which the camera will see.</p>
+<p><img src="/images/courses/VisionTracking/target.png" alt="Full color image of vision target"><br>Now to find only the vision targets we first must filter out the green targets, this can be done in a variety of ways but by far the easiest one is applying a threshold over the image. Applying a threshold consists of selecting a range for each of the image channels, then if a pixel falls within the values it gets set to white, when not it gets set to black. In particular this is called a binary threshold. We want to filter out the retro reflective tape which is very bright, therefor we will want to covert the image to hsv to facilitate the creation of a threshold.</p>
+<p><img src="/images/courses/VisionTracking/targetHSV.png" alt="Hue, Saturation, and Value channels of the target"><br>As we can see from the three images the tape has a very distinct hue and value but the saturation varies greatly. As a result it is of advantage to us to use only the hue and value channels in our threshold rather than trying to include saturation. When we apply the threshold to the image we get the following image which is either black or white. This is called a binary image.</p>
+<p><img src="/images/courses/VisionTracking/targetBinary.png" alt="The binary image of the target"><br>Now with the binary image we can find the contours in the image and determine their height and width. We do this by finding the bounding rectangles of the two areas of white in the image. We can get away with rectangles because the real life shapes are rectangles and our algorithm does not rely on their accuracy being high.</p>
+<p><img src="/images/courses/VisionTracking/targetMinAreaRectLabled.png" alt="The vision targets with bounding rectangles drawn"><br>Now that we know the location and sizes of the two rectangles we can proceed to find the distance of the target and the angle of the target with respect to the camera. That is the angle perceived by the camera not the yaw of the peg.</p>
+<p><img src="/images/courses/VisionTracking/cameraDistance.svg" alt="A camera looking at a vision target at distance d"><br>To calculate the distance d in the figure above we simply have to relate the two sides of the right triangle with the angle θ. To do this we can use the tangent function, solving for the distance yields <span class="nobr"><strong>d = h / tan(θ)</strong></span>. However we still have to calculate theta as we are dealing with pixels not with angles. To do this we can set up a proportion between the number of vertical pixels of the camera and its field of vision. So <span class="nobr"><strong>θ = T<sub>h</sub> / C<sub>h</sub> * C<sub>vFOV</sub></strong></span> where θ is the angle T<sub>h</sub> is the height of the target in pixels, C<sub>h</sub> is the vertical camera resolution and C<sub>vFOV</sub> is the<br>vertical field of vision of the camera in degrees. It can be better to determine the FOV empirically rather than going off of a specification. This same process can be applied to calculating the rotation with respect to the camera.</p>
+<p><img src="/images/courses/VisionTracking/cameraRotation.svg" alt="A camera looking at a vision target at angle θ"><br>To calculate the rotation of the target relative to the camera as in the image above a simple proportion can be used. <span class="nobr"><strong>θ = (2T<sub>x</sub>-C<sub>w</sub>) / C<sub>w</sub> * C<sub>hFOV</sub>/2</strong></span> The equation is derived from getting a percent to either the left or right and then multiplying it by half of the horizontal field of view. T<sub>x</sub> is the targets x location in pixels C<sub>w</sub> is the camera width in pixels and C<sub>hFOV</sub> is the camera horizontal FOV.</p>
+<p>Congratulations! Now we have calculated the distance and the angle of the vision targets from only an image given by the camera.</p>
+
+</div>
+</section>
+        </div>
+      
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 <a href="/">The Vikings</a><br>
+      Contact us at <a href="mailto:ljhsvikingrobotics@gmail.com" target="_blank">ljhsvikingrobotics@gmail.com</a><br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a><br>
+      Theme is a derivative of <a href="https://github.com/hexojs/hexo-theme-landscape" target="_blank">Landscape</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/donate" class="mobile-nav-link">Donate</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+    <a href="/calendar" class="mobile-nav-link">Calendar</a>
+  
+    <a href="/courses" class="mobile-nav-link">Courses</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
